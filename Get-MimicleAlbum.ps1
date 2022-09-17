@@ -146,7 +146,7 @@ if ($AlbumIds.Count -eq 0) {
 }
 foreach ($albumId in $AlbumIds) {
     $albumInfo = Get-AlbumInfo($albumId)
-    $albumName = $albumInfo.title
+    $albumName = $albumInfo.title.Replace("\", "_").Replace("/", "_").Replace("?", "_").Replace("<", "_").Replace(">", "_").Replace("|", "_").Replace("*", "_")
     if (-not (Test-Path "./$albumName")) {
         [void](New-Item -ItemType Directory "./$albumName")
     }
@@ -209,10 +209,11 @@ foreach ($albumId in $AlbumIds) {
             }
         }
         [string]::Join("`n", @($metadataHeader, $artist, $albumArtist, $genre, $date, $album, "title=$($track.title)", "track=$($track.trackNumber)/$($tracks.Count)")) > "$downloadPath/metadata.txt"
-        .\ffmpeg -allowed_extensions ALL -i "$downloadPath/$trackFileName" -i $coverPath -i "$downloadPath/metadata.txt" -map_metadata 2 -c copy -map 0 -map 1 -disposition:v:0 attached_pic "./$($albumName)/$($track.trackNumber.ToString("00")). $($track.title).m4a" *> "$downloadPath/ffmpeg.log"
+        .\ffmpeg -y -allowed_extensions ALL -i "$downloadPath/$trackFileName" -i $coverPath -i "$downloadPath/metadata.txt" -map_metadata 2 -c copy -map 0 -map 1 -disposition:v:0 attached_pic "./$($albumName)/$($track.trackNumber.ToString("00")). $($track.title.Replace("\", "_").Replace("/", "_").Replace("?", "_").Replace("<", "_").Replace(">", "_").Replace("|", "_").Replace("*", "_")).m4a" *> "$downloadPath/ffmpeg.log"
         if (-not $WithTempFile.IsPresent) {
             Remove-Item -Force -Recurse $downloadPath
         }
+        Start-Sleep 10
     }
     if ($WithCoverFile.IsPresent) {
         Copy-Item $coverPath "./$($albumName)/Cover.webp" -Force
