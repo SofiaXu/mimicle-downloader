@@ -21,7 +21,6 @@ param (
     [switch]
     $WithTempFile
 )
-para
 function Get-UserAlbums(
     $UserToken
 ) {
